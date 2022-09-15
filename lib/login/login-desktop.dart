@@ -1,16 +1,13 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
-import '../entities/jwt-response.dart';
 import '../globals.dart' as globals;
 import 'dart:convert';
 
 import '../main.dart';
 import '../register/register-screen.dart';
-import '../utils/snackbar-service.dart';
-import '../utils/storage-service.dart';
+import '../services/snackbar-service.dart';
+import '../services/storage-service.dart';
 
 class LoginDesktop extends StatefulWidget {
   const LoginDesktop({Key? key}) : super(key: key);

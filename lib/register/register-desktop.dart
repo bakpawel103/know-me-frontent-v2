@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
-import '../entities/jwt-response.dart';
 import '../globals.dart' as globals;
 import 'dart:convert';
-import 'dart:developer';
 
 import '../login/login-screen.dart';
-import '../utils/snackbar-service.dart';
+import '../services/snackbar-service.dart';
 
 class RegisterDesktop extends StatefulWidget {
   const RegisterDesktop({Key? key}) : super(key: key);

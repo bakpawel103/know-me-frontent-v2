@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:know_me_frontent_v2/login/login-screen.dart';
-import 'package:know_me_frontent_v2/utils/storage-service.dart';
+import 'package:know_me_frontent_v2/services/storage-service.dart';
 import 'globals.dart' as globals;
 
 void main() {

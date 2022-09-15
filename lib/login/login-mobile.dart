@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
-import 'package:know_me_frontent_v2/utils/storage-service.dart';
-import '../entities/jwt-response.dart';
+import 'package:know_me_frontent_v2/services/storage-service.dart';
 import '../globals.dart' as globals;
 import 'dart:convert';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../main.dart';
 import '../register/register-screen.dart';
-import '../utils/snackbar-service.dart';
+import '../services/snackbar-service.dart';
 
 class LoginMobile extends StatefulWidget {
   const LoginMobile({Key? key}) : super(key: key);
