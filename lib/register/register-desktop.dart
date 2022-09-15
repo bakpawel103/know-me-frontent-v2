@@ -1,32 +1,33 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import '../entities/jwt-response.dart';
 import '../globals.dart' as globals;
 import 'dart:convert';
+import 'dart:developer';
 
-import '../main.dart';
-import '../register/register-screen.dart';
+import '../login/login-screen.dart';
 import '../utils/snackbar-service.dart';
-import '../utils/storage-service.dart';
 
-class LoginDesktop extends StatefulWidget {
-  const LoginDesktop({Key? key}) : super(key: key);
+class RegisterDesktop extends StatefulWidget {
+  const RegisterDesktop({Key? key}) : super(key: key);
 
   @override
-  State<LoginDesktop> createState() => _LoginDesktopState();
+  State<RegisterDesktop> createState() => _RegisterDesktopState();
 }
 
-class _LoginDesktopState extends State<LoginDesktop> {
+class _RegisterDesktopState extends State<RegisterDesktop> {
   final usernameController = TextEditingController();
+  final emailController = TextEditingController();
   final passwordController = TextEditingController();
+  final confirmPasswordController = TextEditingController();
 
   @override
   void dispose() {
     usernameController.dispose();
+    emailController.dispose();
     passwordController.dispose();
+    confirmPasswordController.dispose();
     super.dispose();
   }
 
@@ -61,7 +62,7 @@ class _LoginDesktopState extends State<LoginDesktop> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text(
-                    'Welcome back',
+                    'Welcome a new user',
                     style: GoogleFonts.inter(
                       fontSize: 17,
                       color: Colors.black,
@@ -69,7 +70,7 @@ class _LoginDesktopState extends State<LoginDesktop> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Login to your account',
+                    'Register a new account',
                     style: GoogleFonts.inter(
                       fontSize: 23,
                       color: Colors.black,
@@ -98,6 +99,26 @@ class _LoginDesktopState extends State<LoginDesktop> {
                   ),
                   const SizedBox(height: 10),
                   TextField(
+                    controller: emailController,
+                    decoration: InputDecoration(
+                      enabledBorder: const OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.black),
+                        borderRadius: BorderRadius.all(Radius.circular(30)),
+                      ),
+                      focusedBorder: const OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.black45),
+                        borderRadius: BorderRadius.all(Radius.circular(30)),
+                      ),
+                      prefixIcon: const Icon(Icons.person),
+                      hintText: "Email",
+                      filled: true,
+                      fillColor: Colors.grey[200],
+                      isDense: true,
+                      contentPadding: const EdgeInsets.all(8),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  TextField(
                     controller: passwordController,
                     obscureText: true,
                     decoration: InputDecoration(
@@ -117,6 +138,27 @@ class _LoginDesktopState extends State<LoginDesktop> {
                       contentPadding: const EdgeInsets.all(8),
                     ),
                   ),
+                  const SizedBox(height: 10),
+                  TextField(
+                    controller: confirmPasswordController,
+                    obscureText: true,
+                    decoration: InputDecoration(
+                      enabledBorder: const OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.black),
+                        borderRadius: BorderRadius.all(Radius.circular(30)),
+                      ),
+                      focusedBorder: const OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.black45),
+                        borderRadius: BorderRadius.all(Radius.circular(30)),
+                      ),
+                      prefixIcon: const Icon(Icons.password),
+                      hintText: "Confirm Password",
+                      filled: true,
+                      fillColor: Colors.grey[200],
+                      isDense: true,
+                      contentPadding: const EdgeInsets.all(8),
+                    ),
+                  ),
                   const SizedBox(height: 25),
                   Row(),
                   const SizedBox(height: 30),
@@ -125,14 +167,14 @@ class _LoginDesktopState extends State<LoginDesktop> {
                         backgroundColor:
                             MaterialStateProperty.all(Colors.blue)),
                     onPressed: () async => {
-                      if (await logIn() == true)
+                      if (await register() == true)
                         {
                           await Future.delayed(const Duration(seconds: 3)),
                           Navigator.pushAndRemoveUntil(
                             context,
                             MaterialPageRoute(
                               builder: (BuildContext context) {
-                                return const MainApp();
+                                return const LoginWidget();
                               },
                             ),
                             (r) {
@@ -142,7 +184,7 @@ class _LoginDesktopState extends State<LoginDesktop> {
                         },
                     },
                     child: const Text(
-                      "Login",
+                      "Register",
                       style: TextStyle(color: Colors.white),
                     ),
                   ),
@@ -153,7 +195,7 @@ class _LoginDesktopState extends State<LoginDesktop> {
                       cursor: SystemMouseCursors.click,
                       child: GestureDetector(
                         child: const Text(
-                          "Not have an account? Register...",
+                          "Already have an account? Log in...",
                           style: TextStyle(
                               fontWeight: FontWeight.w100, color: Colors.blue),
                         ),
@@ -162,7 +204,7 @@ class _LoginDesktopState extends State<LoginDesktop> {
                             context,
                             MaterialPageRoute(
                               builder: (BuildContext context) {
-                                return const RegisterWidget();
+                                return const LoginWidget();
                               },
                             ),
                             (r) {
@@ -182,16 +224,26 @@ class _LoginDesktopState extends State<LoginDesktop> {
     );
   }
 
-  Future<bool> logIn() async {
-    if (usernameController.text.isEmpty || passwordController.text.isEmpty) {
+  Future<bool> register() async {
+    if (usernameController.text.isEmpty ||
+        emailController.text.isEmpty ||
+        passwordController.text.isEmpty ||
+        confirmPasswordController.text.isEmpty) {
       SnackBarService.showSnackBar(
           context, "Fields cannot be empty", Colors.red);
       return false;
     }
 
-    var url = '${globals.baseApiUri}api/auth/signin';
+    if (passwordController.text != confirmPasswordController.text) {
+      SnackBarService.showSnackBar(
+          context, "Passwords has to be the same", Colors.red);
+      return false;
+    }
+
+    var url = '${globals.baseApiUri}api/auth/signup';
     Map data = {
       'username': usernameController.text,
+      'email': emailController.text,
       'password': passwordController.text
     };
 
@@ -202,9 +254,7 @@ class _LoginDesktopState extends State<LoginDesktop> {
 
     if (response.statusCode == 200) {
       SnackBarService.showSnackBar(
-          context, "Successfully logged in", Colors.green);
-
-      StorageService.setLoggedUser(response.body);
+          context, "Successfully registered", Colors.green);
       return true;
     } else {
       SnackBarService.showSnackBar(

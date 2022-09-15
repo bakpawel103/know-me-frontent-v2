@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:know_me_frontent_v2/login/login-screen.dart';
+import 'package:know_me_frontent_v2/utils/storage-service.dart';
 import 'globals.dart' as globals;
 
 void main() {
@@ -16,7 +17,16 @@ class MainApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: globals.loggedIn ? const HomePage() : const LoginWidget(),
+      home: FutureBuilder<bool>(
+        future: StorageService.isLoggedIn(),
+        builder: (context, AsyncSnapshot<bool> snapshot) {
+          if (snapshot.data == true) {
+            return const HomePage();
+          } else {
+            return const LoginWidget();
+          }
+        },
+      ),
     );
   }
 }
