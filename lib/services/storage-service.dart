@@ -24,6 +24,6 @@ class StorageService {
     final prefs = await SharedPreferences.getInstance();
 
     await prefs.setBool('loggedIn', true);
-    await prefs.setString('loggedInUser', jwtResponse);
+    await prefs.setString('loggedUser', jwtResponse);
   }
 }

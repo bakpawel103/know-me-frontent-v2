@@ -20,6 +20,8 @@ class _RegisterMobileState extends State<RegisterMobile> {
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
 
+  bool loading = false;
+
   @override
   void dispose() {
     usernameController.dispose();
@@ -155,31 +157,42 @@ class _RegisterMobileState extends State<RegisterMobile> {
                     const SizedBox(height: 25),
                     Row(),
                     const SizedBox(height: 30),
-                    TextButton(
-                      style: ButtonStyle(
-                          backgroundColor:
-                              MaterialStateProperty.all(Colors.blue)),
-                      onPressed: () async => {
-                        if (await register() == true)
-                          {
-                            await Future.delayed(const Duration(seconds: 3)),
-                            Navigator.pushAndRemoveUntil(
-                              context,
-                              MaterialPageRoute(
-                                builder: (BuildContext context) {
-                                  return const LoginWidget();
-                                },
-                              ),
-                              (r) {
-                                return false;
+                    Align(
+                      child: LayoutBuilder(builder: (context, constraints) {
+                        if (loading) {
+                          return const CircularProgressIndicator();
+                        } else {
+                          return ConstrainedBox(
+                            constraints: const BoxConstraints(minWidth: 200),
+                            child: TextButton(
+                              style: ButtonStyle(
+                                  backgroundColor:
+                                  MaterialStateProperty.all(Colors.blue)),
+                              onPressed: () async => {
+                                if (await register() == true)
+                                  {
+                                    await Future.delayed(const Duration(seconds: 3)),
+                                    Navigator.pushAndRemoveUntil(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (BuildContext context) {
+                                          return const LoginWidget();
+                                        },
+                                      ),
+                                          (r) {
+                                        return false;
+                                      },
+                                    ),
+                                  },
                               },
+                              child: const Text(
+                                "Register",
+                                style: TextStyle(color: Colors.white),
+                              ),
                             ),
-                          },
-                      },
-                      child: const Text(
-                        "Register",
-                        style: TextStyle(color: Colors.white),
-                      ),
+                          );
+                        }
+                      }),
                     ),
                     const SizedBox(height: 5),
                     Container(
@@ -220,18 +233,29 @@ class _RegisterMobileState extends State<RegisterMobile> {
   }
 
   Future<bool> register() async {
+    setState(() => loading = true);
+
     if (usernameController.text.isEmpty ||
         emailController.text.isEmpty ||
         passwordController.text.isEmpty ||
         confirmPasswordController.text.isEmpty) {
       SnackBarService.showSnackBar(
           context, "Fields cannot be empty", Colors.red);
+      setState(() => loading = false);
+      return false;
+    }
+
+    if (!isEmailValid(emailController.text)) {
+      SnackBarService.showSnackBar(
+          context, "Email is not valid", Colors.red);
+      setState(() => loading = false);
       return false;
     }
 
     if (passwordController.text != confirmPasswordController.text) {
       SnackBarService.showSnackBar(
           context, "Passwords has to be the same", Colors.red);
+      setState(() => loading = false);
       return false;
     }
 
@@ -249,12 +273,20 @@ class _RegisterMobileState extends State<RegisterMobile> {
 
     if (response.statusCode == 200) {
       SnackBarService.showSnackBar(
-          context, "Successfully registered", Colors.green);
+          context, "Successfully registered. Navigating to log in screen...", Colors.green);
+      setState(() => loading = false);
       return true;
     } else {
       SnackBarService.showSnackBar(
           context, mapResponseBody['message'], Colors.red);
+      setState(() => loading = false);
       return false;
     }
+  }
+
+  bool isEmailValid(String email) {
+    return RegExp(
+        r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$')
+        .hasMatch(email);
   }
 }

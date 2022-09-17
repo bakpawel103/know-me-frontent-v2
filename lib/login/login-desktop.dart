@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import '../globals.dart' as globals;
 import 'dart:convert';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import '../main.dart';
 import '../register/register-screen.dart';
@@ -19,6 +20,8 @@ class LoginDesktop extends StatefulWidget {
 class _LoginDesktopState extends State<LoginDesktop> {
   final usernameController = TextEditingController();
   final passwordController = TextEditingController();
+
+  bool loading = false;
 
   @override
   void dispose() {
@@ -44,10 +47,13 @@ class _LoginDesktopState extends State<LoginDesktop> {
       child: Row(
         children: [
           Expanded(
-              child: Image.asset(
-            'assets/mountain.jpg',
-            fit: BoxFit.fitHeight,
-          )),
+            child: SvgPicture.asset(
+              "assets/login_screen_image.svg",
+              height: 400,
+              width: 400,
+              fit: BoxFit.scaleDown,
+            ),
+          ),
           Expanded(
             child: Container(
               color: Colors.white,
@@ -117,31 +123,42 @@ class _LoginDesktopState extends State<LoginDesktop> {
                   const SizedBox(height: 25),
                   Row(),
                   const SizedBox(height: 30),
-                  TextButton(
-                    style: ButtonStyle(
-                        backgroundColor:
-                            MaterialStateProperty.all(Colors.blue)),
-                    onPressed: () async => {
-                      if (await logIn() == true)
-                        {
-                          await Future.delayed(const Duration(seconds: 3)),
-                          Navigator.pushAndRemoveUntil(
-                            context,
-                            MaterialPageRoute(
-                              builder: (BuildContext context) {
-                                return const MainApp();
-                              },
-                            ),
-                            (r) {
-                              return false;
+                  Align(
+                    child: LayoutBuilder(builder: (context, constraints) {
+                      if (loading) {
+                        return const CircularProgressIndicator();
+                      } else {
+                        return ConstrainedBox(
+                          constraints: const BoxConstraints(minWidth: 200),
+                          child: TextButton(
+                            style: ButtonStyle(
+                                backgroundColor:
+                                MaterialStateProperty.all(Colors.blue)),
+                            onPressed: () async => {
+                              if (await logIn() == true)
+                                {
+                                  await Future.delayed(const Duration(seconds: 2)),
+                                  Navigator.pushAndRemoveUntil(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (BuildContext context) {
+                                        return const MainApp();
+                                      },
+                                    ),
+                                        (r) {
+                                      return false;
+                                    },
+                                  ),
+                                },
                             },
+                            child: const Text(
+                              "Login",
+                              style: TextStyle(color: Colors.white),
+                            ),
                           ),
-                        },
-                    },
-                    child: const Text(
-                      "Login",
-                      style: TextStyle(color: Colors.white),
-                    ),
+                        );
+                      }
+                    }),
                   ),
                   const SizedBox(height: 5),
                   Container(
@@ -180,9 +197,12 @@ class _LoginDesktopState extends State<LoginDesktop> {
   }
 
   Future<bool> logIn() async {
+    setState(() => loading = true);
+
     if (usernameController.text.isEmpty || passwordController.text.isEmpty) {
       SnackBarService.showSnackBar(
           context, "Fields cannot be empty", Colors.red);
+      setState(() => loading = false);
       return false;
     }
 
@@ -202,10 +222,12 @@ class _LoginDesktopState extends State<LoginDesktop> {
           context, "Successfully logged in", Colors.green);
 
       StorageService.setLoggedUser(response.body);
+      setState(() => loading = false);
       return true;
     } else {
       SnackBarService.showSnackBar(
           context, mapResponseBody['message'], Colors.red);
+      setState(() => loading = false);
       return false;
     }
   }

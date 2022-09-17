@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import '../globals.dart' as globals;
 import 'dart:convert';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import '../login/login-screen.dart';
 import '../services/snackbar-service.dart';
@@ -19,6 +20,8 @@ class _RegisterDesktopState extends State<RegisterDesktop> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
+
+  bool loading = false;
 
   @override
   void dispose() {
@@ -46,10 +49,13 @@ class _RegisterDesktopState extends State<RegisterDesktop> {
       child: Row(
         children: [
           Expanded(
-              child: Image.asset(
-            'assets/mountain.jpg',
-            fit: BoxFit.fitHeight,
-          )),
+            child: SvgPicture.asset(
+              "assets/login_screen_image.svg",
+              height: 400,
+              width: 400,
+              fit: BoxFit.scaleDown,
+            ),
+          ),
           Expanded(
             child: Container(
               color: Colors.white,
@@ -60,7 +66,7 @@ class _RegisterDesktopState extends State<RegisterDesktop> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text(
-                    'Welcome a new user',
+                    'Hi!',
                     style: GoogleFonts.inter(
                       fontSize: 17,
                       color: Colors.black,
@@ -160,31 +166,43 @@ class _RegisterDesktopState extends State<RegisterDesktop> {
                   const SizedBox(height: 25),
                   Row(),
                   const SizedBox(height: 30),
-                  TextButton(
-                    style: ButtonStyle(
-                        backgroundColor:
-                            MaterialStateProperty.all(Colors.blue)),
-                    onPressed: () async => {
-                      if (await register() == true)
-                        {
-                          await Future.delayed(const Duration(seconds: 3)),
-                          Navigator.pushAndRemoveUntil(
-                            context,
-                            MaterialPageRoute(
-                              builder: (BuildContext context) {
-                                return const LoginWidget();
-                              },
-                            ),
-                            (r) {
-                              return false;
+                  Align(
+                    child: LayoutBuilder(builder: (context, constraints) {
+                      if (loading) {
+                        return const CircularProgressIndicator();
+                      } else {
+                        return ConstrainedBox(
+                          constraints: const BoxConstraints(minWidth: 200),
+                          child: TextButton(
+                            style: ButtonStyle(
+                                backgroundColor:
+                                    MaterialStateProperty.all(Colors.blue)),
+                            onPressed: () async => {
+                              if (await register() == true)
+                                {
+                                  await Future.delayed(
+                                      const Duration(seconds: 2)),
+                                  Navigator.pushAndRemoveUntil(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (BuildContext context) {
+                                        return const LoginWidget();
+                                      },
+                                    ),
+                                    (r) {
+                                      return false;
+                                    },
+                                  ),
+                                },
                             },
+                            child: const Text(
+                              "Register",
+                              style: TextStyle(color: Colors.white),
+                            ),
                           ),
-                        },
-                    },
-                    child: const Text(
-                      "Register",
-                      style: TextStyle(color: Colors.white),
-                    ),
+                        );
+                      }
+                    }),
                   ),
                   const SizedBox(height: 5),
                   Container(
@@ -223,18 +241,29 @@ class _RegisterDesktopState extends State<RegisterDesktop> {
   }
 
   Future<bool> register() async {
+    setState(() => loading = true);
+
     if (usernameController.text.isEmpty ||
         emailController.text.isEmpty ||
         passwordController.text.isEmpty ||
         confirmPasswordController.text.isEmpty) {
       SnackBarService.showSnackBar(
           context, "Fields cannot be empty", Colors.red);
+      setState(() => loading = false);
+      return false;
+    }
+
+    if (!isEmailValid(emailController.text)) {
+      SnackBarService.showSnackBar(
+          context, "Email is not valid", Colors.red);
+      setState(() => loading = false);
       return false;
     }
 
     if (passwordController.text != confirmPasswordController.text) {
       SnackBarService.showSnackBar(
           context, "Passwords has to be the same", Colors.red);
+      setState(() => loading = false);
       return false;
     }
 
@@ -252,12 +281,20 @@ class _RegisterDesktopState extends State<RegisterDesktop> {
 
     if (response.statusCode == 200) {
       SnackBarService.showSnackBar(
-          context, "Successfully registered", Colors.green);
+          context, "Successfully registered. Navigating to log in screen...", Colors.green);
+      setState(() => loading = false);
       return true;
     } else {
       SnackBarService.showSnackBar(
           context, mapResponseBody['message'], Colors.red);
+      setState(() => loading = false);
       return false;
     }
+  }
+
+  bool isEmailValid(String email) {
+    return RegExp(
+        r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$')
+        .hasMatch(email);
   }
 }

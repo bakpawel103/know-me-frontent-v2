@@ -37,6 +37,8 @@ dependencies:
   google_fonts: ^3.0.1
   http: ^0.13.5
   shared_preferences: ^2.0.15
+  flip_card: ^0.6.0
+  flutter_svg: ^1.1.5
 
 dev_dependencies:
   flutter_test:
@@ -62,7 +64,7 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-     - mountain.jpg
+     - login_screen_image.svg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

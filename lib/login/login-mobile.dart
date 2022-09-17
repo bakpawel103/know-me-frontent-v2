@@ -20,6 +20,8 @@ class _LoginMobileState extends State<LoginMobile> {
   final usernameController = TextEditingController();
   final passwordController = TextEditingController();
 
+  bool loading = false;
+
   @override
   void dispose() {
     usernameController.dispose();
@@ -112,31 +114,42 @@ class _LoginMobileState extends State<LoginMobile> {
                     const SizedBox(height: 25),
                     Row(),
                     const SizedBox(height: 30),
-                    TextButton(
-                      style: ButtonStyle(
-                          backgroundColor:
-                              MaterialStateProperty.all(Colors.blue)),
-                      onPressed: () async => {
-                        if (await logIn() == true)
-                          {
-                            await Future.delayed(const Duration(seconds: 3)),
-                            Navigator.pushAndRemoveUntil(
-                              context,
-                              MaterialPageRoute(
-                                builder: (BuildContext context) {
-                                  return const MainApp();
-                                },
-                              ),
-                              (r) {
-                                return false;
+                    Align(
+                      child: LayoutBuilder(builder: (context, constraints) {
+                        if (loading) {
+                          return const CircularProgressIndicator();
+                        } else {
+                          return ConstrainedBox(
+                            constraints: const BoxConstraints(minWidth: 200),
+                            child: TextButton(
+                              style: ButtonStyle(
+                                  backgroundColor:
+                                  MaterialStateProperty.all(Colors.blue)),
+                              onPressed: () async => {
+                                if (await logIn() == true)
+                                  {
+                                    await Future.delayed(const Duration(seconds: 3)),
+                                    Navigator.pushAndRemoveUntil(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (BuildContext context) {
+                                          return const MainApp();
+                                        },
+                                      ),
+                                          (r) {
+                                        return false;
+                                      },
+                                    ),
+                                  },
                               },
+                              child: const Text(
+                                "Login",
+                                style: TextStyle(color: Colors.white),
+                              ),
                             ),
-                          },
-                      },
-                      child: const Text(
-                        "Login",
-                        style: TextStyle(color: Colors.white),
-                      ),
+                          );
+                        }
+                      }),
                     ),
                     const SizedBox(height: 5),
                     Container(
@@ -177,9 +190,12 @@ class _LoginMobileState extends State<LoginMobile> {
   }
 
   Future<bool> logIn() async {
+    setState(() => loading = true);
+
     if (usernameController.text.isEmpty || passwordController.text.isEmpty) {
       SnackBarService.showSnackBar(
           context, "Fields cannot be empty", Colors.red);
+      setState(() => loading = false);
       return false;
     }
 
@@ -199,10 +215,12 @@ class _LoginMobileState extends State<LoginMobile> {
           context, "Successfully logged in", Colors.green);
 
       StorageService.setLoggedUser(response.body);
+      setState(() => loading = false);
       return true;
     } else {
       SnackBarService.showSnackBar(
           context, mapResponseBody['message'], Colors.red);
+      setState(() => loading = false);
       return false;
     }
   }
