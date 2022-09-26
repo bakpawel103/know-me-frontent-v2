@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import '../globals.dart' as globals;
 import 'dart:convert';
@@ -65,17 +64,17 @@ class _RegisterDesktopState extends State<RegisterDesktop> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Text(
+                  const Text(
                     'Hi!',
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: 17,
                       color: Colors.black,
                     ),
                   ),
                   const SizedBox(height: 8),
-                  Text(
+                  const Text(
                     'Register a new account',
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: 23,
                       color: Colors.black,
                       fontWeight: FontWeight.w700,

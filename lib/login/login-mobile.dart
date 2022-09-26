@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:know_me_frontent_v2/services/storage-service.dart';
 import '../globals.dart' as globals;
@@ -54,17 +53,17 @@ class _LoginMobileState extends State<LoginMobile> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Text(
+                    const Text(
                       'Welcome back',
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: 17,
                         color: Colors.black,
                       ),
                     ),
                     const SizedBox(height: 8),
-                    Text(
+                    const Text(
                       'Login to your account',
-                      style: GoogleFonts.inter(
+                      style: TextStyle(
                         fontSize: 23,
                         color: Colors.black,
                         fontWeight: FontWeight.w700,
@@ -208,13 +207,13 @@ class _LoginMobileState extends State<LoginMobile> {
     var response = await http.post(Uri.parse(url),
         headers: {"Content-Type": "application/json"}, body: json.encode(data));
 
-    Map mapResponseBody = json.decode(response.body);
+    Map mapResponseBody = json.decode(utf8.decode(response.bodyBytes));
 
     if (response.statusCode == 200) {
       SnackBarService.showSnackBar(
           context, "Successfully logged in", Colors.green);
 
-      StorageService.setLoggedUser(response.body);
+      StorageService.setLoggedUser(utf8.decode(response.bodyBytes));
       setState(() => loading = false);
       return true;
     } else {

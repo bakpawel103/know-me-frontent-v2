@@ -1,22 +1,29 @@
 class Question {
   final int id;
-  final String name;
-  final String description;
-  final bool answered;
+  String name;
+  String description;
+  bool answered;
 
-  const Question({
+  Question({
     required this.id,
     required this.name,
     required this.description,
-    required this.answered,
+    this.answered = false,
   });
 
   factory Question.fromJson(Map<String, dynamic> json) {
     return Question(
-      id: json['id'],
-      name: json['name'],
-      description: json['description'],
-      answered: json['answered'],
+      id: json['id'] as int,
+      name: json['name'] as String,
+      description: json['description'] as String,
+      answered: json['answered'] as bool,
     );
   }
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'name': name,
+        'description': description,
+        'answered': answered,
+      };
 }

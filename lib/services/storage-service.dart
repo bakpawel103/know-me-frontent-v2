@@ -1,29 +1,27 @@
 import 'dart:convert';
 
 import 'package:know_me_frontent_v2/entities/jwt-response.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:localstorage/localstorage.dart';
 
 class StorageService {
-  static Future<bool> isLoggedIn() async {
-    final prefs = await SharedPreferences.getInstance();
+  static final LocalStorage storage = LocalStorage('know-us-more');
 
-    return prefs.getBool('loggedIn') ?? false;
+  static bool isLoggedIn() {
+    return storage.getItem('loggedIn') ?? false;
   }
 
-  static Future<JwtResponse?> getLoggedUser() async {
-    final prefs = await SharedPreferences.getInstance();
+  static JwtResponse? getLoggedUser() {
+    var loggedUser = storage.getItem('loggedUser');
 
-    if(prefs.getString('loggedUser') == null) {
+    if(loggedUser == null) {
       return null;
     }
 
-    return JwtResponse.fromJson(jsonDecode(prefs.getString('loggedUser') as String));
+    return JwtResponse.fromJson(jsonDecode(loggedUser));
   }
 
-  static Future<void> setLoggedUser(String jwtResponse) async {
-    final prefs = await SharedPreferences.getInstance();
-
-    await prefs.setBool('loggedIn', true);
-    await prefs.setString('loggedUser', jwtResponse);
+  static void setLoggedUser(String jwtResponse) {
+    storage.setItem('loggedIn', true);
+    storage.setItem('loggedUser', jwtResponse);
   }
 }
