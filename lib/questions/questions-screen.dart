@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../entities/deck.dart';
@@ -10,7 +9,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 import '../globals.dart' as globals;
-import 'package:know_me_frontent_v2/services/snackbar-service.dart';
+import 'package:know_me_frontend_v2/services/snackbar-service.dart';
 
 class QuestionsScreen extends StatefulWidget {
   const QuestionsScreen({Key? key, required this.currentDeck}) : super(key: key);

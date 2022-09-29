@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:know_me_frontent_v2/register/register-desktop.dart';
-import 'package:know_me_frontent_v2/register/register-mobile.dart';
+import 'package:know_me_frontend_v2/register/register-desktop.dart';
+import 'package:know_me_frontend_v2/register/register-mobile.dart';
 
 class RegisterWidget extends StatelessWidget {
   const RegisterWidget({Key? key}) : super(key: key);

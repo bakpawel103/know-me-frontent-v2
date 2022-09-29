@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:know_me_frontent_v2/entities/question.dart';
+import 'package:know_me_frontend_v2/entities/question.dart';
 
 class Deck {
   final String secretId;

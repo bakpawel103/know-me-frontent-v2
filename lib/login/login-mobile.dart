@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:know_me_frontent_v2/services/storage-service.dart';
+import 'package:know_me_frontend_v2/services/storage-service.dart';
 import '../globals.dart' as globals;
 import 'dart:convert';
 
